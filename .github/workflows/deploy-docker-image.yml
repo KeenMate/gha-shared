@@ -33,7 +33,7 @@ on:
         required: false
 jobs:
   build:
-    name: Build release
+    name: Build and deploy image
     runs-on: self-hosted
     env:
       MIX_ENV: ${{ inputs.mix-environment }}
