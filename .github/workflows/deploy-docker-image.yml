@@ -6,8 +6,9 @@ on:
         required: true
         type: string
       image-tag:
-        required: true
+        required: false
         type: string
+        default: latest
       deployment-host:
         required: true
         type: string
