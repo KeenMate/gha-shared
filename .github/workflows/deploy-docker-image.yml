@@ -19,6 +19,10 @@ on:
         required: false
         type: string
         default: prod
+      npm-script:
+        required: false
+        type: string
+        default: build
     secrets:
       KEENMATE_REGISTRY_USERNAME:
         required: true
@@ -54,6 +58,7 @@ jobs:
           registry.km8.es/${{ inputs.image-name }}:${{ inputs.image-tag }}
         build-args: |
           NPM_TOKEN=${{ secrets.KEENMATE_NPM_TOKEN }}
+          NPM_SCRIPT=${{ inputs.npm-script }}
           MIX_ENV=${{ inputs.mix-environment }}
     - uses: appleboy/ssh-action@v0.1.5
       with:
