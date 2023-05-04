@@ -36,6 +36,10 @@ on:
         required: true
       KEENMATE_NPM_TOKEN:
         required: false
+      NUGET_USERNAME:
+        required: false
+      NUGET_PASSWORD:
+        required: false
 jobs:
   build:
     name: Build and deploy image
