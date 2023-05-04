@@ -64,6 +64,8 @@ jobs:
           NPM_TOKEN=${{ secrets.KEENMATE_NPM_TOKEN }}
           NPM_SCRIPT=${{ inputs.npm-script }}
           MIX_ENV=${{ inputs.mix-environment }}
+          NUGET_USERNAME=${{ secrets.NUGET_USERNAME }}
+          NUGET_PASSWORD=${{ secretsv.NUGET_PASSWORD }}
     - uses: appleboy/ssh-action@v0.1.5
       with:
         host: ${{ inputs.deployment-host }}
