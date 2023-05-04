@@ -65,7 +65,7 @@ jobs:
           NPM_SCRIPT=${{ inputs.npm-script }}
           MIX_ENV=${{ inputs.mix-environment }}
           NUGET_USERNAME=${{ secrets.NUGET_USERNAME }}
-          NUGET_PASSWORD=${{ secretsv.NUGET_PASSWORD }}
+          NUGET_PASSWORD=${{ secrets.NUGET_PASSWORD }}
     - uses: appleboy/ssh-action@v0.1.5
       with:
         host: ${{ inputs.deployment-host }}
