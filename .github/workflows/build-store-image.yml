@@ -9,6 +9,18 @@ on:
         required: false
         type: string
         default: latest
+      
+      # Path of docker build context
+      docker-build-context:
+        required: false
+        type: string
+        default: .
+      # Relative to context
+      dockerfile-name:
+        required: false
+        type: string
+        default: Dockerfile
+        
       mix-environment:
         required: false
         type: string
@@ -38,7 +50,8 @@ jobs:
         password: ${{ secrets.KEENMATE_REGISTRY_PASSWORD }}
     - uses: docker/build-push-action@v3
       with:
-        context: .
+        context: ${{inputs.docker-build-context}}
+        file: ${{inputs.dockerfile-name}}
         push: true
         tags: |
           registry.km8.es/${{ inputs.image-name }}:${{ inputs.image-tag }}
