@@ -9,7 +9,7 @@ on:
         required: false
         type: string
         default: latest
-        
+
       # Path of docker build context
       docker-build-context:
         required: false
@@ -39,46 +39,41 @@ on:
         required: true
       KEENMATE_REGISTRY_PASSWORD:
         required: true
-      BUILDER_SSH_USERNAME:
-        required: true
-      BUILDER_SSH_KEY:
-        required: true
-      BUILDER_SSH_PASSPHRASE:
-        required: true
       KEENMATE_NPM_TOKEN:
         required: false
       NUGET_USERNAME:
         required: false
       NUGET_PASSWORD:
         required: false
+      BUILDER_SSH_USERNAME:
+        required: true
+      BUILDER_SSH_KEY:
+        required: true
+      BUILDER_SSH_PASSPHRASE:
+        required: true
 jobs:
   build:
-    name: Build and deploy image
+    uses: ./.github/workflows/build-store-image.yml
+    with:
+      image-name: ${{ inputs.image-name }}
+      image-tag: ${{ inputs.image-tag }}
+      docker-build-context: ${{ inputs.docker-build-context }}
+      dockerfile-name: ${{ inputs.dockerfile-name }}
+      mix-environment: ${{ inputs.mix-environment }}
+      npm-script: ${{ inputs.npm-script }}
+    secrets:
+      KEENMATE_REGISTRY_USERNAME: ${{ secrets.KEENMATE_REGISTRY_USERNAME }}
+      KEENMATE_REGISTRY_PASSWORD: ${{ secrets.KEENMATE_REGISTRY_PASSWORD }}
+      KEENMATE_NPM_TOKEN: ${{ secrets.KEENMATE_NPM_TOKEN }}
+      NUGET_USERNAME: ${{ secrets.NUGET_USERNAME }}
+      NUGET_PASSWORD: ${{ secrets.NUGET_PASSWORD }}
+
+  deploy:
+    name: Deploy image
+    needs: build
     runs-on: self-hosted
-    env:
-      MIX_ENV: ${{ inputs.mix-environment }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: docker/setup-buildx-action@v2
-    - uses: docker/login-action@v2
-      with:
-        registry: registry.km8.es
-        username: ${{ secrets.KEENMATE_REGISTRY_USERNAME }}
-        password: ${{ secrets.KEENMATE_REGISTRY_PASSWORD }}
-    - uses: docker/build-push-action@v3
-      with:
-        context: ${{inputs.docker-build-context}}
-        file: ${{inputs.dockerfile-name}}
-        push: true
-        tags: |
-          registry.km8.es/${{ inputs.image-name }}:${{ inputs.image-tag }}
-        build-args: |
-          NPM_TOKEN=${{ secrets.KEENMATE_NPM_TOKEN }}
-          NPM_SCRIPT=${{ inputs.npm-script }}
-          MIX_ENV=${{ inputs.mix-environment }}
-          NUGET_USERNAME=${{ secrets.NUGET_USERNAME }}
-          NUGET_PASSWORD=${{ secrets.NUGET_PASSWORD }}
-    - uses: appleboy/ssh-action@v0.1.5
+    - uses: appleboy/ssh-action@v1
       with:
         host: ${{ inputs.deployment-host }}
         port: 22
@@ -87,6 +82,6 @@ jobs:
         passphrase: ${{ secrets.BUILDER_SSH_PASSPHRASE }}
         script: |
           cd /srv/docker/${{ inputs.deployment-dir }}
-          docker-compose down
-          docker-compose pull
-          docker-compose up -d
+          docker compose down
+          docker compose pull
+          docker compose up -d

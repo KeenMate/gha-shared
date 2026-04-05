@@ -9,7 +9,7 @@ on:
         required: false
         type: string
         default: latest
-      
+
       # Path of docker build context
       docker-build-context:
         required: false
@@ -20,7 +20,7 @@ on:
         required: false
         type: string
         default: Dockerfile
-        
+
       mix-environment:
         required: false
         type: string
@@ -34,24 +34,30 @@ on:
         required: true
       KEENMATE_REGISTRY_PASSWORD:
         required: true
+      KEENMATE_NPM_TOKEN:
+        required: false
+      NUGET_USERNAME:
+        required: false
+      NUGET_PASSWORD:
+        required: false
 jobs:
   build:
-    name: Build and deploy image
+    name: Build and store image
     runs-on: self-hosted
     env:
       MIX_ENV: ${{ inputs.mix-environment }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: docker/setup-buildx-action@v2
-    - uses: docker/login-action@v2
+    - uses: actions/checkout@v4
+    - uses: docker/setup-buildx-action@v3
+    - uses: docker/login-action@v3
       with:
         registry: registry.km8.es
         username: ${{ secrets.KEENMATE_REGISTRY_USERNAME }}
         password: ${{ secrets.KEENMATE_REGISTRY_PASSWORD }}
-    - uses: docker/build-push-action@v3
+    - uses: docker/build-push-action@v6
       with:
-        context: ${{inputs.docker-build-context}}
-        file: ${{inputs.dockerfile-name}}
+        context: ${{ inputs.docker-build-context }}
+        file: ${{ inputs.dockerfile-name }}
         push: true
         tags: |
           registry.km8.es/${{ inputs.image-name }}:${{ inputs.image-tag }}
@@ -59,3 +65,5 @@ jobs:
           NPM_TOKEN=${{ secrets.KEENMATE_NPM_TOKEN }}
           NPM_SCRIPT=${{ inputs.npm-script }}
           MIX_ENV=${{ inputs.mix-environment }}
+          NUGET_USERNAME=${{ secrets.NUGET_USERNAME }}
+          NUGET_PASSWORD=${{ secrets.NUGET_PASSWORD }}
