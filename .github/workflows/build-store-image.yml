@@ -47,14 +47,14 @@ jobs:
     env:
       MIX_ENV: ${{ inputs.mix-environment }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: docker/setup-buildx-action@v3
-    - uses: docker/login-action@v3
+    - uses: actions/checkout@v5
+    - uses: docker/setup-buildx-action@v4
+    - uses: docker/login-action@v4
       with:
         registry: registry.km8.es
         username: ${{ secrets.KEENMATE_REGISTRY_USERNAME }}
         password: ${{ secrets.KEENMATE_REGISTRY_PASSWORD }}
-    - uses: docker/build-push-action@v6
+    - uses: docker/build-push-action@v7
       with:
         context: ${{ inputs.docker-build-context }}
         file: ${{ inputs.dockerfile-name }}
@@ -67,3 +67,8 @@ jobs:
           MIX_ENV=${{ inputs.mix-environment }}
           NUGET_USERNAME=${{ secrets.NUGET_USERNAME }}
           NUGET_PASSWORD=${{ secrets.NUGET_PASSWORD }}
+          # Per-commit value so a Dockerfile can `ARG GIT_SHA` right before its
+          # compile/release step to bust stale build-cache layers (prevents
+          # e.g. Elixir releases shipping an .app with a missing .beam).
+          # Unused by Dockerfiles that don't declare the ARG (harmless warning).
+          GIT_SHA=${{ github.sha }}
